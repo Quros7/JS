@@ -1,8 +1,8 @@
 const fs = require('fs');
 const { argv } = require("process");
-let mode = argv[2];
-let c_inp = argv[3];
-let c_out = argv[4];
+let mode = argv[2]; // считываем режим работы программы
+let c_inp = argv[3]; // считываем исходный файл
+let c_out = argv[4]; // считываем файл, в который запишем результат
 
 function code (inp, out) {
     let s_inp = fs.readFileSync(inp, "utf8");
@@ -14,13 +14,34 @@ function code (inp, out) {
     for (let ind = 1; ind < length; ind++) {
         l2 = s_inp[ind];
         if (l1 == l2) {
-            counter ++;
+            counter += 1;
+            // обработка последнего элемента
+            if (ind == length - 1) {
+                if (counter >= 4) {
+                    if (counter <= 255) {
+                        result += "#" + String.fromCharCode(counter) + l1;
+                    } else {
+                        num = Math.floor(counter / 255);
+                        diff = counter - 255 * num;
+                        for (let k = 1; k <= num; k++) {
+                            result += "#" + String.fromCharCode(255) + l1;
+                        }
+                        if (diff > 0) {
+                            result += "#" + String.fromCharCode(diff) + l1;
+                        }
+                    }
+                } else {
+                    for (let k = 1; k <= counter; k++) {
+                        result += l1;
+                    }
+                }
+            }
         } else {
             if (counter >= 4) {
                 if (counter <= 255) {
-                    result += "#" + String.fromCharCode(counter) + l1; //замени середину на просто counter
+                    result += "#" + String.fromCharCode(counter) + l1;
                 } else {
-                    num = counter / 255;
+                    num = Math.floor(counter / 255);
                     diff = counter - 255 * num;
                     for (let k = 1; k <= num; k++) {
                         result += "#" + String.fromCharCode(255) + l1;
@@ -33,29 +54,14 @@ function code (inp, out) {
                 for (let k = 1; k <= counter; k++) {
                     result += l1;
                 }
-            } 
+            }
+            // обработка последнего элемента
+            if (ind == length - 1) {
+                result += l2;
+                break
+            }
             l1 = l2;
             counter = 1;
-        }
-        if (ind == length - 1) {
-            if (counter >= 4) {
-                if (counter <= 255) {
-                    result += "#" + String.fromCharCode(counter) + l2; //замени середину на просто counter
-                } else {
-                    num = Math.floor(counter / 255);
-                    diff = counter - 255 * num;
-                    for (let k = 1; k <= num; k++) {
-                        result += "#" + String.fromCharCode(255) + l2;
-                    }
-                    if (diff > 0) {
-                        result += "#" + String.fromCharCode(diff) + l2;
-                    }
-                }
-            } else {
-                for (let k = 1; k <= counter; k++) {
-                    result += l2;
-                }
-            }
         }
     }
     fs.writeFileSync(out, result);
@@ -67,7 +73,7 @@ function decode (inp, out) {
     let result = "";
     for (let ind = 0; ind < length; ind++) {
         if (s_inp[ind] == "#") {
-            let counter = s_inp.charCodeAt(ind+1); //верни s_inp[ind+1]
+            let counter = s_inp.charCodeAt(ind+1); //+ 4; //+4 - обработка сдвига при кодировании
             let symb = s_inp[ind+2];
             for (let k = 1; k <= counter; k++) {
                 result += symb;
@@ -80,6 +86,7 @@ function decode (inp, out) {
     fs.writeFileSync(out, result);
 }
 
+// обработка выбора режима
 if (mode == "code") {
     code(c_inp, c_out);
 }
