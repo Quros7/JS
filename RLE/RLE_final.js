@@ -51,12 +51,25 @@ function code (inp, out) {
                     }
                 }
             } else {
+                // обработки символа #
+                if (l1 == "#") {
+                    result += "#" + String.fromCharCode(counter) + l1;
+                    l1 = l2;
+                    counter = 1;
+                    continue;
+                }
                 for (let k = 1; k <= counter; k++) {
                     result += l1;
                 }
             }
             // обработка последнего элемента
             if (ind == length - 1) {
+                if (l1 == "#") {
+                    result += "#" + String.fromCharCode(counter) + l1;
+                    l1 = l2;
+                    counter = 1;
+                    continue;
+                }
                 result += l2;
                 break
             }
