@@ -1,3 +1,7 @@
+const fs = require('fs');
+const { argv } = require("process");
+let inp = argv[2]; // считываем исходный файл
+
 // возвращает два узла с минимальной частотой
 function Pick_mins (arr) {
     tr_l = arr.length;
@@ -36,17 +40,37 @@ function Node (letter, freq, used, father, code) {
 function Code (str) {
     let n_str = "";
     // для обработки создаём копию дерева с параметром letter объектов вместо самих объектов
-    let l_tree = new Array();
+    let c_tree = new Array();
     for (let k = 0; k < tree.length; k++) {
-        l_tree.push(tree[k].letter);
+        c_tree.push(tree[k].letter);
     }
     for (let k = 0; k < str.length; k++) {
-        n_str += tree[l_tree.indexOf(inpStr[k])].code;
+        n_str += tree[c_tree.indexOf(inpStr[k])].code;
     }
     return n_str;
 }
-    
-let inpStr = 'abrakadabra';
+
+// декодирует строку
+function Decode (str) {
+    let n_str = "";
+    // для обработки создаём копию специального алфавита с кодом каждой буквы
+    let d_tree = new Array();
+    for (let k = 0; k < decode_alph.length; k++) {
+        d_tree.push(decode_alph[k][0]);
+    }
+    let word = "";
+    for (let k = 0; k < str.length; k++) {
+        word += str[k];
+        let n_ind = d_tree.indexOf(word);
+        if (n_ind != -1) {
+            n_str += decode_alph[n_ind][1];
+            word = "";
+        }
+    }
+    return n_str;
+}
+
+let inpStr = fs.readFileSync(inp, "utf8");
 // создаём массив алфавита с частотами
 let alph = new Array(); 
 for (let i = 0; i < inpStr.length; i++) {
@@ -83,16 +107,28 @@ while (n_letter.length < alph_len) {
 let min_father = alph_len;
 let max_father = tree.length - 1;
 // для обработки создаём копию дерева с параметром father объектов вместо самих объектов
-c_tree = new Array();
+f_tree = new Array();
 for (let k = 0; k < tree.length; k++) {
-    c_tree.push(tree[k].father);
+    f_tree.push(tree[k].father);
 }
 // обрабатываем каждый уровень дерева
 for (max_father; max_father >= min_father; max_father--) {
-    let ind1 = c_tree.indexOf(max_father);
-    let ind2 = c_tree.indexOf(max_father, ind1 + 1);
+    let ind1 = f_tree.indexOf(max_father);
+    let ind2 = f_tree.indexOf(max_father, ind1 + 1);
     tree[ind1].code = tree[max_father].code + "1";
+    if (alph_len > 1)
     tree[ind2].code = tree[max_father].code + "0";
 }
+// для декодирования создаём закодированный алфавит
+decode_alph = new Array();
+for (let m = 0; m < alph_len; m++) {
+    decode_alph.push([tree[m].code, tree[m].letter]);
+}
+
+console.log("Tree: ");
 console.log(tree);
-console.log(Code(inpStr));
+console.log("Coded string: ")
+let coded_str = Code(inpStr);
+console.log(coded_str);
+console.log("Decoded string: ")
+console.log(Decode(coded_str));
