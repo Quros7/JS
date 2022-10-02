@@ -20,8 +20,9 @@ function Pick_mins (arr) {
     tree[ind2].used = 1;
     return [arr[ind1], arr[ind2]];
 }
+
 // создание узлов дерева
-function Node(letter, freq, used, father, code) { 
+function Node (letter, freq, used, father, code) { 
     //this = {}; 
        this.letter = letter; 
        this.freq = freq; 
@@ -29,7 +30,21 @@ function Node(letter, freq, used, father, code) {
        this.father = father; 
        this.code = code; 
     //return this 
-   }; 
+};
+
+// кодирует строку
+function Code (str) {
+    let n_str = "";
+    // для обработки создаём копию дерева с параметром letter объектов вместо самих объектов
+    let l_tree = new Array();
+    for (let k = 0; k < tree.length; k++) {
+        l_tree.push(tree[k].letter);
+    }
+    for (let k = 0; k < str.length; k++) {
+        n_str += tree[l_tree.indexOf(inpStr[k])].code;
+    }
+    return n_str;
+}
     
 let inpStr = 'abrakadabra';
 // создаём массив алфавита с частотами
@@ -50,7 +65,6 @@ for (i in alph){
     let n = new Node(i, alph[i], 0, null, ""); 
     tree.push(n);
 }
-console.log(tree);
 
 // достраиваем дерево
 let n_letter = "";
@@ -64,4 +78,21 @@ while (n_letter.length < alph_len) {
     tree[tree.indexOf(mins[0])].father = tree.indexOf(n);
     tree[tree.indexOf(mins[1])].father = tree.indexOf(n);
 }
+
+// кодируем элементы дерева
+let min_father = alph_len;
+let max_father = tree.length - 1;
+// для обработки создаём копию дерева с параметром father объектов вместо самих объектов
+c_tree = new Array();
+for (let k = 0; k < tree.length; k++) {
+    c_tree.push(tree[k].father);
+}
+// обрабатываем каждый уровень дерева
+for (max_father; max_father >= min_father; max_father--) {
+    let ind1 = c_tree.indexOf(max_father);
+    let ind2 = c_tree.indexOf(max_father, ind1 + 1);
+    tree[ind1].code = tree[max_father].code + "1";
+    tree[ind2].code = tree[max_father].code + "0";
+}
 console.log(tree);
+console.log(Code(inpStr));
