@@ -25,6 +25,7 @@ let h = 0;
 for (i in alph) {
     h -= alph[i] * Math.log(alph[i]);
 }
-h /= Math.log(n);
 
-console.log(h);
+if (h == 0) {
+    console.log(0);
+} else console.log(h / Math.log(n));
