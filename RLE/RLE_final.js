@@ -1,3 +1,4 @@
+const { sign } = require('crypto');
 const fs = require('fs');
 const { argv } = require("process");
 let mode = argv[2]; // считываем режим работы программы
@@ -7,88 +8,44 @@ let c_out = argv[4]; // считываем файл, в который запи�
 function code (inp, out) {
     let s_inp = fs.readFileSync(inp, "utf8");
     let result = "";
-    let length = s_inp.length;
-    let l1 = s_inp[0];
-    let l2 = "";
-    let counter = 1;
-    for (let ind = 1; ind < length; ind++) {
-        l2 = s_inp[ind];
-        if (l1 == l2) {
+    let len = s_inp.length;
+    counter = 1;
+    ind = 1;
+    for (let ind = 1; ind < len; ind++) {
+        if ((s_inp[ind-1] == s_inp[ind]) && (counter < 255)) {
             counter += 1;
-            // обработка последнего элемента
-            if (ind == length - 1) {
-                if (counter >= 4) {
-                    if (counter <= 255) {
-                        result += "#" + String.fromCharCode(counter) + l1;
-                    } else {
-                        num = Math.floor(counter / 255);
-                        diff = counter - 255 * num;
-                        for (let k = 1; k <= num; k++) {
-                            result += "#" + String.fromCharCode(255) + l1;
-                        }
-                        if (diff > 0) {
-                            result += "#" + String.fromCharCode(diff) + l1;
-                        }
-                    }
-                } else {
-                    for (let k = 1; k <= counter; k++) {
-                        result += l1;
-                    }
-                }
-            }
-        } else {
-            if (counter >= 4) {
-                if (counter <= 255) {
-                    result += "#" + String.fromCharCode(counter) + l1;
-                } else {
-                    num = Math.floor(counter / 255);
-                    diff = counter - 255 * num;
-                    for (let k = 1; k <= num; k++) {
-                        result += "#" + String.fromCharCode(255) + l1;
-                    }
-                    if (diff > 0) {
-                        result += "#" + String.fromCharCode(diff) + l1;
-                    }
-                }
+        } 
+        else {
+            if (counter > 3 || s_inp[ind - 1] == "#") {
+                result += "#" + String.fromCharCode(counter) + s_inp[ind - 1];
             } else {
-                // обработки символа #
-                if (l1 == "#") {
-                    result += "#" + String.fromCharCode(counter) + l1;
-                    l1 = l2;
-                    counter = 1;
-                    continue;
-                }
                 for (let k = 1; k <= counter; k++) {
-                    result += l1;
+                    result += s_inp[ind - 1];
                 }
             }
-            // обработка последнего элемента
-            if (ind == length - 1) {
-                if (l1 == "#") {
-                    result += "#" + String.fromCharCode(counter) + l1;
-                    l1 = l2;
-                    counter = 1;
-                    continue;
-                }
-                result += l2;
-                break
-            }
-            l1 = l2;
             counter = 1;
         }
     }
+    if (counter > 3 || s_inp[len - 1] == "#") {
+        result += "#" + String.fromCharCode(counter) + s_inp[len - 1];
+    } else {
+        for (let k = 1; k <= counter; k++) {
+            result += s_inp[len - 1];
+        }
+    }
     fs.writeFileSync(out, result);
+    console.log("Коэффициент сжатия = ", len / result.length);
 }
 
 function decode (inp, out) {
     let s_inp = fs.readFileSync(inp, "utf8");
-    let length = s_inp.length;
+    let len = s_inp.length;
     let result = "";
-    for (let ind = 0; ind < length; ind++) {
+    for (let ind = 0; ind < len; ind++) {
         if (s_inp[ind] == "#") {
-            let counter = s_inp.charCodeAt(ind+1); //+ 4; //+4 - обработка сдвига при кодировании
-            let symb = s_inp[ind+2];
-            for (let k = 1; k <= counter; k++) {
+            let counter = s_inp.charCodeAt(ind + 1); //+ 4; //+4 - обработка сдвига при кодировании
+            let symb = s_inp[ind + 2];
+            for (let k = 0; k < counter; k++) {
                 result += symb;
             }
             ind += 2;
