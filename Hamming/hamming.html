@@ -46,8 +46,7 @@
             if (encoded[pos_of_wrong-1] == 0) encoded[pos_of_wrong-1] = 1
             else encoded[pos_of_wrong-1] = 0;
             // создаём результирующую строку восстановленной последовательности
-            let decoded_res = "";
-            for (let i = 0; i < encoded.length; i++) decoded_res += encoded[i];
+            let decoded_res = "" + encoded[2] + encoded[4] + encoded[5] + encoded[6];
             document.getElementById("myDecodeMessage").value = decoded_res;
             document.getElementById("PositionOfWrong").value = pos_of_wrong;
         }
