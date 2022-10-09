@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamming code</title>
+    <script>
+        function code() {
+            // считываем исходную последовательность
+            let message = document.getElementById("myInputMessage").value.split('');
+            for (let i = 0; i < message.length; i++) message[i] *= 1;
+            // добавляем контрольные биты (изначально нулевые) на позиции соответствующие степеням двойки
+            // в нашем случае на позиции 1, 2, 4
+            let n_mes = ["0"*1, "0"*1, message[0], "0"*1, message[1], message[2], message[3]];
+            // вычисляем значения контрольных битов
+            n_mes[0] = (n_mes[0] + n_mes[2] + n_mes[4] + n_mes[6]) % 2;
+            n_mes[1] = (n_mes[1] + n_mes[2] + n_mes[5] + n_mes[6]) % 2;
+            n_mes[3] = (n_mes[3] + n_mes[4] + n_mes[5] + n_mes[6]) % 2;
+            // создаём результирующую строку закодированной последовательности
+            let coded_res = "";
+            for (let i = 0; i < n_mes.length; i++) coded_res += n_mes[i];
+            document.getElementById("myEncodeMessage").value = coded_res;
+        }
+        function decode() {
+            // считываем закодированную последовательность
+            let encoded = document.getElementById("myEncodeMessage").value.split('');
+            for (let i = 0; i < encoded.length; i++) encoded[i] *= 1;
+            // создаём дубликат последовательности и пересчитываем контрольные биты
+            n_mes = new Array();
+            for (let i = 0; i < encoded.length; i++) n_mes.push(encoded[i]);
+            n_mes[0] = 0;
+            n_mes[1] = 0;
+            n_mes[3] = 0;
+            n_mes[0] = (n_mes[0] + n_mes[2] + n_mes[4] + n_mes[6]) % 2;
+            n_mes[1] = (n_mes[1] + n_mes[2] + n_mes[5] + n_mes[6]) % 2;
+            n_mes[3] = (n_mes[3] + n_mes[4] + n_mes[5] + n_mes[6]) % 2;
+            // сравниваем исходные контрольные биты и пересчитанные
+            // если не совпадают, то суммируем их номер их позиции в отдельной переменной
+            // общая сумма - позиция поврежденного бита
+            pos_of_wrong = 0;
+            for (let i = 1; i <= n_mes.length; i++) {
+                if (encoded[i-1] != n_mes[i-1]) pos_of_wrong += i;
+            }
+            // восстанавливает поврежденный бит
+            if (encoded[pos_of_wrong-1] == 0) encoded[pos_of_wrong-1] = 1
+            else encoded[pos_of_wrong-1] = 0;
+            // создаём результирующую строку восстановленной последовательности
+            let decoded_res = "";
+            for (let i = 0; i < encoded.length; i++) decoded_res += encoded[i];
+            document.getElementById("myDecodeMessage").value = decoded_res;
+            document.getElementById("PositionOfWrong").value = pos_of_wrong;
+        }
+    </script>
+</head>
+<body>
+    <h1>My Hamming Code</h1>
+    <p><input type="text", id="myInputMessage"> 4 bites</p>
+    <p><input type="button", value="Code", onclick="code()"></p>
+    <p><input type="text", id="myEncodeMessage"> encoded message</p>
+    <p><input type="button", value="Decode", onclick="decode()"></p>
+    <p><input type="text", id="myDecodeMessage"> decoded message</p>
+    <p>Повреждённый бит на позиции: <input type="text", id="PositionOfWrong"></p>
+    <p>(индексация с 1; значение "0" означает, что повреждений нет)</p>
+</body>
+</html>
