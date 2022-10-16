@@ -1,0 +1,8 @@
+set 26 0
+input 27
+set 28 1
+set 29 1
+add 26 29 26
+mul 26 28 28
+cmp 26 27 11
+output 28

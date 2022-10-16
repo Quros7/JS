@@ -1,0 +1,11 @@
+set 34 0
+input 35
+input 36
+set 37 1
+set 38 1
+cmp 34 36 19
+jmp 31
+add 34 38 34
+mul 37 35 37
+cmp 34 36 19
+output 37
