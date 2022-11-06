@@ -12,6 +12,9 @@ let t = argv[3] + ""; // считываем искомую подстроку
 tlen = t.length;
 let positions = []; // массив найденный позиций вхождений подстроки в строку
 
+// начало отсчёта времени
+console.time();
+
 for (let i = 0; i < slen - tlen + 1; i++) {
     flag = true;
     for (let j = 0; j < tlen; j++) {
@@ -24,3 +27,6 @@ for (let i = 0; i < slen - tlen + 1; i++) {
 }
 
 console.log(positions);
+
+// конец отсчёта времени
+console.timeEnd();
