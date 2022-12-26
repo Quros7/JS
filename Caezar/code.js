@@ -1,13 +1,10 @@
-//                   исходное сообщ.   защифрованное сообщ.   сдвиг
-// node .\code.js    .\inpcode.txt      .\inpdecode.txt 3       3
 const fs = require("fs");
 const {argv} = require("process");
 let f = fs.readFileSync(argv[2], "utf8"); // считываем файл, название передано как аргумент командной строки
 flen = f.length; // длина файла
-let sh = argv[4]; // величина сдвига
+let sh = argv[4] * 1; // величина сдвига
 let alphabet = "abcdefghijklmnopqrstuvwxyz";
 let upper_alph = alphabet.toUpperCase();
-let pos_up = []; // позиции, на которых располагаются буквы в верхнем регистре
 let alph_len = alphabet.length; // мощность алфавита
 let output = ""; // зашифрованное сообщение
 
