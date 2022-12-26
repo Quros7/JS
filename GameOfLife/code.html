@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game of Life</title>
+	<style type="text/css">
+		body {
+			background: #fff8ed;
+		}
+		.main, .buttons {
+			display: flex;
+			justify-content: center;
+			padding-top: 10px;
+		}
+		.play {
+			background-color: mediumpurple;
+		}
+		.pause {
+			background-color: lavender;
+		}
+	</style>
+</head>
+<body class="pause" id="body">
+<h1 align="center">====={ Game Of Life }=====</h1>
+<div style="width:100vw" class="main">
+	<canvas id="myCanvas" width="400px" height="400px" style="border:2px solid blue;"></canvas>
+</div>
+<div class="buttons">
+<button style="height:40px;width:140px" onclick="go_active()">Старт</button>
+<button style="height:40px;width:140px" onclick="no_active()">Стоп</button>
+<button style="height:40px;width:140px" onclick="init()">Сгенерировать</button>
+<button style="height:40px;width:140px" onclick="clear_all()">Очистить</button>
+</div>
+<h2 align="center">Вы можете задать "живые" клетки кликом по полю или нажав кнопку "Сгенерировать"</h2>
+<!-- <h2 align="center"><input type="text", id="speedform" value="750"><button>Применить</button> Вы можете задать свою скорость обновления в [мс]</h2> -->
+
+<script>
+const fillSize = 20; // кол-во клеток
+const cellSize = 20; // размер клеток
+let currPop = new Array(fillSize);
+let nextPop = new Array(fillSize);
+ 
+for(i=0; i< fillSize; i++){
+	currPop[i] = new Array(fillSize);
+	nextPop[i] = new Array(fillSize);
+	for (j=0; j< fillSize; j++) {
+		currPop[i][j] = 0;
+		nextPop[i][j] = 0;
+	}
+}
+ 
+let c = document.getElementById("myCanvas");
+let ctx = c.getContext("2d");
+draw_nothing();
+
+// function set_speed (){
+// 	let speed = document.getElementById("speedform").value;
+// }
+
+function n_init(){
+	if (c.classList.contains("active")) {
+    	step();
+	}
+}
+
+function init(){ // случайная генерация
+	for(i=0; i< fillSize; i++){
+		for(j=0; j< fillSize; j++){
+			currPop[i][j] = Math.round(Math.random());
+		}
+	}
+	draw();
+}
+
+function getCursorPosition(c, event) { // задаёт по клику нужные стартовые живые клетки
+	const rect = c.getBoundingClientRect();
+	const x = event.clientX - rect.left;
+	const y = event.clientY - rect.top;
+	return [x, y];
+}
+            
+c.addEventListener('mousedown', function(e) {
+	let arr = getCursorPosition(c, e);
+	x = Math.floor(arr[0] / cellSize);
+	y = Math.floor(arr[1] / cellSize);
+	if (currPop[x][y] == 0) {
+		ctx.fillStyle = "#FF0000";
+		currPop[x][y] = 1;
+	}
+	else {
+		ctx.fillStyle = "#FFFFFF";
+		currPop[x][y] = 0;
+	};
+	ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
+})
+
+b = document.getElementById("body");
+function go_active(){
+	// init();
+	c.classList.add("active");
+	b.classList.remove("pause");
+	b.classList.add("play");
+}
+
+function no_active(){
+	c.classList.remove("active");
+	b.classList.remove("play");
+	b.classList.add("pause");
+}
+
+function clear_all(){
+	no_active();
+	draw_nothing();
+}
+
+function draw(){
+	for(i=0; i< fillSize; i++){
+		for(j=0; j< fillSize; j++){
+			if(currPop[i][j] == 1)
+				ctx.fillStyle = "#FF0000";
+			else
+				ctx.fillStyle = "#FFFFFF";
+			ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
+		}
+	}
+}
+
+function draw_nothing(){
+	ctx.fillStyle = "#FFFFFF";
+	for(i=0; i < fillSize; i++){
+		for (j=0; j < fillSize; j++) {
+			currPop[i][j] = 0;
+			nextPop[i][j] = 0;
+			ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
+		}
+	}
+}
+
+function neighbourCont(i,j){
+	num = 0;
+	for(l= -1; l <= 1; l++)
+		for(k = -1; k <=1; k++)
+			if((l != 0) || (k != 0))
+				num += currPop[(i+l+fillSize)%fillSize][(j+k+fillSize)%fillSize];
+	return num;
+}
+function nextGen(){
+	for(i=0; i< fillSize; i++){
+		for(j=0; j< fillSize; j++){
+			nextPop[i][j] = 0;
+			nc = neighbourCont(i,j)
+			if(((currPop[i][j] == 0) && (nc ==3)) || ((currPop[i][j] == 1) && (nc < 4) && (nc > 1)))
+				nextPop[i][j] = 1;
+		}
+	}
+	for(i=0; i< fillSize; i++){
+		for(j=0; j< fillSize; j++){
+			currPop[i][j] = nextPop[i][j];
+		}
+	}
+}
+function step(){
+	nextGen();
+	draw();
+}
+
+let tm = setInterval(n_init, 750);
+</script>
+ 
+</body>
+</html>
